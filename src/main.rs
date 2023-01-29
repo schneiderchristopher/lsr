@@ -1,3 +1,4 @@
+extern crate colored;
 use colored::Colorize;
 use std::{
     env,

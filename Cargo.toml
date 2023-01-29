@@ -2,6 +2,7 @@
 name = "lsr"
 version = "0.1.0"
 authors = ["Christopher Schneider <schneiderchristopher16@gmail.com>"]
+exclude = ["screenshot.png"]
 license = "MIT"
 description = "LS Implementation in Rust"
 readme = "README.md"
@@ -9,6 +10,9 @@ homepage = "https://github.com/schneiderchristopher/lsr"
 repository = "https://github.com/schneiderchristopher/lsr"
 keywords = ["ls", "cli"]
 categories = ["command-line-utilities"]
+
+[[bin]]
+name = "lsr"
 
 [dependencies]
 colored = "2.0.0"
