@@ -1,6 +1,7 @@
 # LSR - A Rust Implementation of LS for Windows(and possibly other platforms)
 
 **This is underdevelopment**
+
 ![Screenshots of lsr](screenshot.png)
 
 ## Quick Start
