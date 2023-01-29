@@ -14,7 +14,7 @@ fn main() -> std::io::Result<()> {
         paths.paths.push(Path::new(content_unwraped));
     }
     paths.get_biggest_str_len();
-    paths.identate_paths();
+    paths.indentate_paths();
     for path in paths.paths.into_iter() {
         path.print();
     }

@@ -66,7 +66,7 @@ impl Paths {
         self.biggest_str_len = start_len;
     }
 
-    pub fn identate_paths(&mut self) {
+    pub fn indentate_paths(&mut self) {
         for path in self.paths.iter_mut() {
             let spaces_to_add = self.biggest_str_len - path.file_name.len();
             let mut count = 0;
