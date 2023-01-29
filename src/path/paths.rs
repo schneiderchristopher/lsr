@@ -15,13 +15,10 @@ pub struct Path {
 
 impl Path {
     pub fn print(&self) {
-        match self.is_dir {
-            true => {
-                println!("{} -", self.file_name.cyan())
-            }
-            false => {
-                println!("{} {}", self.file_name.white(), self.size.yellow())
-            }
+        if self.is_dir {
+            println!("{} -", self.file_name.cyan())
+        } else {
+            println!("{} {}", self.file_name.white(), self.size.yellow())
         }
     }
 
@@ -37,15 +34,18 @@ impl Path {
     }
 
     fn size_string_formatter(size: u64) -> String {
-        // TODO: In the future maybe implement more than terabyte?
-        match size {
-            size if size < KYLOBYTE => format!("{}B", size),
-            size if size > KYLOBYTE && size < MEGABYTE => format!("{}KB", size),
-            size if size > MEGABYTE && size < GIGABYTE => format!("{}MB", size),
-            size if size > GIGABYTE && size < TERABYTE => format!("{}GB", size),
-            size if size > TERABYTE => format!("{}TB", size),
-            _ => format!("Size not implement!"),
-        }
+        let unit = if size < KYLOBYTE {
+            "B"
+        } else if size < MEGABYTE {
+            "KB"
+        } else if size < GIGABYTE {
+            "MB"
+        } else if size < TERABYTE {
+            "GB"
+        } else {
+            "TB"
+        };
+        format!("{size}{unit}")
     }
 }
 
@@ -69,10 +69,8 @@ impl Paths {
     pub fn indentate_paths(&mut self) {
         for path in self.paths.iter_mut() {
             let spaces_to_add = self.biggest_str_len - path.file_name.len();
-            let mut count = 0;
-            while count <= spaces_to_add {
+            for _ in 0..spaces_to_add + 1 {
                 path.file_name.push(' ');
-                count += 1;
             }
         }
     }
