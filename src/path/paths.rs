@@ -40,11 +40,12 @@ impl Path {
         // TODO: In the future maybe implement more than terabyte?
         match size {
             size if size < KYLOBYTE => format!("{}B", size),
-            size if size > KYLOBYTE && size < MEGABYTE => format!("{}KB", size),
-            size if size > MEGABYTE && size < GIGABYTE => format!("{}MB", size),
-            size if size > GIGABYTE && size < TERABYTE => format!("{}GB", size),
-            size if size > TERABYTE => format!("{}TB", size),
-            _ => format!("Size not implement!"),
+            size if size >= KYLOBYTE && size < MEGABYTE => format!("{}KB", size / KYLOBYTE),
+            size if size >= MEGABYTE && size < GIGABYTE => format!("{}MB", size / MEGABYTE),
+            size if size >= GIGABYTE && size < TERABYTE => format!("{}GB", size / GIGABYTE),
+            size if size >= TERABYTE => format!("{}TB", size / TERABYTE),
+            // Anything above 1 TB will just be divided and shown as TB, e.g. 293 TB
+            _ => unreachable!(),
         }
     }
 }
