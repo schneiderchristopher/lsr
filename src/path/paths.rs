@@ -78,3 +78,33 @@ impl Paths {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn size_string_formatter_less_than_1_kb() {
+        assert_eq!(Path::size_string_formatter(495), "495B");
+    }
+
+    #[test]
+    fn size_string_formatter_exactly_1_kb() {
+        assert_eq!(Path::size_string_formatter(1000), "1KB");
+    }
+
+    #[test]
+    fn size_string_formatter_less_than_1_tb() {
+        assert_eq!(Path::size_string_formatter(299392942), "299MB");
+    }
+
+    #[test]
+    fn size_string_formatter_exactly_1_tb() {
+        assert_eq!(Path::size_string_formatter(1000000000000), "1TB");
+    }
+
+    #[test]
+    fn size_string_formatter_more_than_1_tb() {
+        assert_eq!(Path::size_string_formatter(293380504804052), "293TB");
+    }
+}
