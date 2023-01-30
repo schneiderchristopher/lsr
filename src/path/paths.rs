@@ -15,13 +15,10 @@ pub struct Path {
 
 impl Path {
     pub fn print(&self) {
-        match self.is_dir {
-            true => {
-                println!("{} -", self.file_name.cyan())
-            }
-            false => {
-                println!("{} {}", self.file_name.white(), self.size.yellow())
-            }
+        if self.is_dir {
+            println!("{} -", self.file_name.cyan())
+        } else {
+            println!("{} {}", self.file_name.white(), self.size.yellow())
         }
     }
 
@@ -37,15 +34,16 @@ impl Path {
     }
 
     fn size_string_formatter(size: u64) -> String {
-        // TODO: In the future maybe implement more than terabyte?
-        match size {
-            size if size < KYLOBYTE => format!("{}B", size),
-            size if size >= KYLOBYTE && size < MEGABYTE => format!("{}KB", size / KYLOBYTE),
-            size if size >= MEGABYTE && size < GIGABYTE => format!("{}MB", size / MEGABYTE),
-            size if size >= GIGABYTE && size < TERABYTE => format!("{}GB", size / GIGABYTE),
-            size if size >= TERABYTE => format!("{}TB", size / TERABYTE),
-            // Anything above 1 TB will just be divided and shown as TB, e.g. 293 TB
-            _ => unreachable!(),
+        if size < KYLOBYTE {
+            format!("{size}B")
+        } else if size < MEGABYTE {
+            format!("{}KB", size / KYLOBYTE)
+        } else if size < GIGABYTE {
+            format!("{}MB", size / MEGABYTE)
+        } else if size < TERABYTE {
+            format!("{}GB", size / GIGABYTE)
+        } else {
+            format!("{}TB", size / TERABYTE)
         }
     }
 }
@@ -70,10 +68,8 @@ impl Paths {
     pub fn indentate_paths(&mut self) {
         for path in self.paths.iter_mut() {
             let spaces_to_add = self.biggest_str_len - path.file_name.len();
-            let mut count = 0;
-            while count <= spaces_to_add {
+            for _ in 0..spaces_to_add + 1 {
                 path.file_name.push(' ');
-                count += 1;
             }
         }
     }
