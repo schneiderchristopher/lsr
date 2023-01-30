@@ -1,17 +1,12 @@
-extern crate lsr;
-use lsr::path::paths::*;
-use std::{
-    env,
-    fs::{self},
-};
+use lsr::path::paths::{Path, Paths};
+use std::{env, fs};
 
 fn main() -> std::io::Result<()> {
     let path = env::current_dir()?;
     let contents = fs::read_dir(&path)?;
     let mut paths = Paths::default();
     for content in contents {
-        let content_unwraped = content.unwrap();
-        paths.paths.push(Path::new(content_unwraped));
+        paths.paths.push(Path::new(content?));
     }
     paths.get_biggest_str_len();
     paths.indentate_paths();
