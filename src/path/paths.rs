@@ -55,7 +55,7 @@ pub struct Paths {
 }
 
 impl Paths {
-    pub fn get_biggest_str_len(&mut self) {
+    fn get_biggest_str_len(&mut self) {
         let mut start_len: usize = 0;
         for path in self.paths.iter_mut() {
             if path.file_name.len() > start_len {
@@ -66,6 +66,7 @@ impl Paths {
     }
 
     pub fn indentate_paths(&mut self) {
+        self.get_biggest_str_len();
         for path in self.paths.iter_mut() {
             let spaces_to_add = self.biggest_str_len - path.file_name.len();
             for _ in 0..spaces_to_add + 1 {
@@ -102,5 +103,29 @@ mod tests {
     #[test]
     fn size_string_formatter_more_than_1_tb() {
         assert_eq!(Path::size_string_formatter(293380504804052), "293TB");
+    }
+
+    #[test]
+    fn names_should_have_same_size() {
+        let path1 = Path {
+            file_name: "test".to_owned(),
+            is_dir: false,
+            size: "1kb".to_owned(),
+        };
+        let path2 = Path {
+            file_name: "test_test".to_owned(),
+            is_dir: false,
+            size: "1kb".to_owned(),
+        };
+        let mut paths = Paths::default();
+        paths.paths.push(path1);
+        paths.paths.push(path2);
+
+        paths.indentate_paths();
+
+        assert_eq!(
+            paths.paths.get(0).unwrap().file_name.len(),
+            paths.paths.get(1).unwrap().file_name.len(),
+        );
     }
 }

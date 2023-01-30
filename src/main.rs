@@ -8,7 +8,6 @@ fn main() -> std::io::Result<()> {
     for content in contents {
         paths.paths.push(Path::new(content?));
     }
-    paths.get_biggest_str_len();
     paths.indentate_paths();
     for path in paths.paths.into_iter() {
         path.print();
