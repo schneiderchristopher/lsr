@@ -21,14 +21,17 @@ pub struct Path {
 
 impl Path {
     pub fn print(&self) {
+        let mut file_name_color = self.file_name.blue();
+        let mut size_color = self.size.white();
         if !self.is_dir {
-            self.size.yellow();
+            file_name_color = self.file_name.white();
+            size_color = self.size.yellow();
         }
         println!(
             "{} {} {}",
-            self.file_name.white(),
-            self.size,
-            self.time.blue()
+            file_name_color,
+            size_color,
+            self.time.bright_cyan()
         )
     }
 
