@@ -65,13 +65,20 @@ impl Paths {
         self.biggest_str_len = start_len;
     }
 
-    pub fn indentate_paths(&mut self) {
+    fn indentate_paths(&mut self) {
         self.get_biggest_str_len();
         for path in self.paths.iter_mut() {
             let spaces_to_add = self.biggest_str_len - path.file_name.len();
             for _ in 0..spaces_to_add + 1 {
                 path.file_name.push(' ');
             }
+        }
+    }
+
+    pub fn print(mut self) {
+        self.indentate_paths();
+        for path in self.paths.into_iter() {
+            path.print();
         }
     }
 }

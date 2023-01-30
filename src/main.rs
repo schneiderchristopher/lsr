@@ -8,9 +8,6 @@ fn main() -> std::io::Result<()> {
     for content in contents {
         paths.paths.push(Path::new(content?));
     }
-    paths.indentate_paths();
-    for path in paths.paths.into_iter() {
-        path.print();
-    }
+    paths.print();
     Ok(())
 }
