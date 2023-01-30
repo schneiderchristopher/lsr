@@ -2,8 +2,8 @@ use chrono::NaiveDateTime;
 use colored::Colorize;
 use std::{
     fmt::Error,
-    fs::{DirEntry, Metadata},
-    time::UNIX_EPOCH,
+    fs::DirEntry,
+    time::{SystemTime, UNIX_EPOCH},
 };
 
 const KYLOBYTE: u64 = 1000;
@@ -41,13 +41,13 @@ impl Path {
             file_name,
             is_dir,
             size: Path::size_string_formatter(size),
-            time: Path::set_time(metadata).unwrap(),
+            time: Path::set_time(metadata.modified().unwrap()).unwrap(),
         }
     }
 
     fn size_string_formatter(size: u64) -> String {
         if size == 0 {
-            format!("-")
+            "-".to_string()
         } else if size < KYLOBYTE {
             format!("{size}B")
         } else if size < MEGABYTE {
@@ -61,21 +61,15 @@ impl Path {
         }
     }
 
-    fn set_time(metadata: Metadata) -> Result<String, Error> {
-        if let Ok(sys_time) = metadata.modified() {
-            if let Ok(duration) = sys_time.duration_since(UNIX_EPOCH) {
-                if let Some(time) =
-                    NaiveDateTime::from_timestamp_millis(duration.as_millis() as i64)
-                {
-                    Ok(time.format("%e %b %R").to_string())
-                } else {
-                    panic!("Could not get time from milliseconds")
-                }
+    fn set_time(sys_time: SystemTime) -> Result<String, Error> {
+        if let Ok(duration) = sys_time.duration_since(UNIX_EPOCH) {
+            if let Some(time) = NaiveDateTime::from_timestamp_millis(duration.as_millis() as i64) {
+                Ok(time.format("%e %b %R").to_string())
             } else {
-                panic!("Time must gone backwards!")
+                panic!("Could not get time from milliseconds")
             }
         } else {
-            panic!("Not implement in this platform")
+            panic!("Time must gone backwards!")
         }
     }
 }
@@ -123,6 +117,8 @@ impl Paths {
 
 #[cfg(test)]
 mod tests {
+    use std::time::Duration;
+
     use super::*;
 
     #[test]
@@ -200,5 +196,14 @@ mod tests {
             paths.paths.get(0).unwrap().size.len(),
             paths.paths.get(1).unwrap().size.len(),
         );
+    }
+
+    #[test]
+    fn date_format_should_be_corret() {
+        // Mon Jan 30 2023 20:37:54 UTC+0
+        let time = SystemTime::UNIX_EPOCH + Duration::from_millis(1675111074521);
+        let time_formatted = Path::set_time(time).unwrap();
+
+        assert_eq!(time_formatted, "30 Jan 20:37")
     }
 }
