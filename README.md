@@ -19,16 +19,7 @@ cargo run
 
 ## RoadMap
 
-| Development | Status |
-| :--- | :----: |
-| Testing | Not done |
-| CMD Arguments* | Not done |
-| Listing specific dir* | Not done |
-| Hiding dot files in default execution* | Not done |
-| Listing with subdirs* | Not done |
-
-My plan basically is to implement the whole ``ls`` functionality in this program, so this roadmap will problaby get big very soon!
-*These will be CMD arguments.
+Checkout [milestones](https://github.com/schneiderchristopher/lsr/milestones)
 
 ## Contributing
 
