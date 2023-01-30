@@ -34,18 +34,17 @@ impl Path {
     }
 
     fn size_string_formatter(size: u64) -> String {
-        let unit = if size < KYLOBYTE {
-            "B"
+        if size < KYLOBYTE {
+            format!("{size}B")
         } else if size < MEGABYTE {
-            "KB"
+            format!("{}KB", size / KYLOBYTE)
         } else if size < GIGABYTE {
-            "MB"
+            format!("{}MB", size / MEGABYTE)
         } else if size < TERABYTE {
-            "GB"
+            format!("{}GB", size / GIGABYTE)
         } else {
-            "TB"
-        };
-        format!("{size}{unit}")
+            format!("{}TB", size / TERABYTE)
+        }
     }
 }
 
