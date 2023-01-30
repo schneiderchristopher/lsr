@@ -12,3 +12,9 @@ These are the references that I used to build the LSR
 Easy color in terminal (only tested on windows for now)
 
 - https://docs.rs/colored/latest/colored/
+
+# Chrono
+
+Needed to easy handle time
+
+- https://docs.rs/chrono/0.4.23/chrono/index.html
