@@ -18,3 +18,4 @@ name = "lsr"
 [dependencies]
 colored = "2.0.0"
 chrono = "0.4.23"
+clap = { version = "4.1.4", features = ["derive"] }

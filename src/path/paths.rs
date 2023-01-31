@@ -80,6 +80,9 @@ impl Path {
 #[derive(Debug, Default)]
 pub struct Paths {
     pub paths: Vec<Path>,
+    pub long: bool,
+    pub all: bool,
+    pub tree: (bool, String),
 }
 
 impl Paths {
@@ -114,6 +117,15 @@ impl Paths {
         self.indentate_paths();
         for path in self.paths.into_iter() {
             path.print();
+        }
+    }
+
+    pub fn setup_args(&mut self, args: (bool, bool, Option<String>)) {
+        let (all, long, tree) = args;
+        self.all = all;
+        self.long = long;
+        if let Some(tree) = tree {
+            self.tree = (true, tree);
         }
     }
 }
@@ -208,5 +220,19 @@ mod tests {
         let time_formatted = Path::set_time(time).unwrap();
 
         assert_eq!(time_formatted, "30 Jan 20:37")
+    }
+
+    #[test]
+    fn setup_args_should_setup() {
+        let mut paths = Paths::default();
+        let all = true;
+        let long = true;
+        let tree = Some("dir".to_owned());
+
+        paths.setup_args((all, long, tree));
+
+        assert_eq!(paths.all, all);
+        assert_eq!(paths.long, long);
+        assert_eq!(paths.tree, (true, "dir".to_owned()));
     }
 }
