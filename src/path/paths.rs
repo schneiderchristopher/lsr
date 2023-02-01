@@ -11,7 +11,7 @@ const MEGABYTE: u64 = 1000 * KYLOBYTE;
 const GIGABYTE: u64 = 1000 * MEGABYTE;
 const TERABYTE: u64 = 1000 * GIGABYTE;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Path {
     file_name: String,
     is_dir: bool,
@@ -116,9 +116,17 @@ impl Paths {
     }
 
     pub fn print(mut self) {
+        self.print_constructor();
         self.indentate_paths();
         for path in self.paths.into_iter() {
             path.print();
+        }
+    }
+
+    fn print_constructor(&mut self) {
+        if !self.all {
+            self.paths
+                .retain_mut(|path| !path.file_name.starts_with("."));
         }
     }
 
@@ -236,5 +244,61 @@ mod tests {
         assert_eq!(paths.all, all);
         assert_eq!(paths.long, long);
         assert_eq!(paths.tree, (true, "dir".to_owned()));
+    }
+
+    #[test]
+    fn no_all_argument_should_not_print_dot_files() {
+        let mut paths = Paths::default();
+        let all = false;
+        let long = false;
+        let tree = None;
+
+        paths.setup_args((all, long, tree));
+        let path1 = Path {
+            file_name: ".test".to_owned(),
+            is_dir: false,
+            size: "1kb".to_owned(),
+            time: "test".to_owned(),
+        };
+        let path2 = Path {
+            file_name: "test_test".to_owned(),
+            is_dir: false,
+            size: "1kb".to_owned(),
+            time: "test".to_owned(),
+        };
+
+        paths.paths.push(path1.clone());
+        paths.paths.push(path2);
+        paths.print_constructor();
+
+        assert_eq!(paths.paths.contains(&path1), false);
+    }
+
+    #[test]
+    fn all_argument_should_print_dot_files() {
+        let mut paths = Paths::default();
+        let all = true;
+        let long = false;
+        let tree = None;
+        paths.setup_args((all, long, tree));
+
+        let path1 = Path {
+            file_name: ".test".to_owned(),
+            is_dir: false,
+            size: "1kb".to_owned(),
+            time: "test".to_owned(),
+        };
+        let path2 = Path {
+            file_name: "test_test".to_owned(),
+            is_dir: false,
+            size: "1kb".to_owned(),
+            time: "test".to_owned(),
+        };
+
+        paths.paths.push(path1.clone());
+        paths.paths.push(path2);
+        paths.print_constructor();
+
+        assert_eq!(paths.paths.contains(&path1), true);
     }
 }
