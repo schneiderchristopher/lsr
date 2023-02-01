@@ -38,6 +38,10 @@ Also, I want to stay to vanilla rust as possible, so if you introduce a new pack
 
 You can issue a tip for me related to project structure, CI/Testing, Coding, etc. I'm new to the world of Open Source and I am open to learn.
 
+### Before PR
+
+``cargo test`` before the PR. All test should pass before a PR, if want to PR without tests passing, add a comment to the PR explaning why
+
 ## Final Considerations
 
 This is my first try at Open Source, I know there's probably a thousand better implementations of the LS command in Rust. But I want to experience how Open Source works :) Thanks for passing by!
