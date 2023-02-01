@@ -1,4 +1,4 @@
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Local, NaiveDateTime, Offset, TimeZone};
 use colored::Colorize;
 use std::{
     fmt::Error,
@@ -67,7 +67,9 @@ impl Path {
     fn set_time(sys_time: SystemTime) -> Result<String, Error> {
         if let Ok(duration) = sys_time.duration_since(UNIX_EPOCH) {
             if let Some(time) = NaiveDateTime::from_timestamp_millis(duration.as_millis() as i64) {
-                Ok(time.format("%e %b %R").to_string())
+                let local_offset = Local.timestamp_nanos(time.timestamp_nanos()).offset().fix();
+                let local_date_time = DateTime::<Local>::from_utc(time, local_offset);
+                Ok(local_date_time.format("%e %b %R").to_string())
             } else {
                 panic!("Could not get time from milliseconds")
             }
