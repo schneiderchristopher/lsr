@@ -122,14 +122,13 @@ impl Paths {
 
         if self.long && !self.tree.0 {
             self.paths.iter_mut().for_each(|path| {
-                let file_name_color: colored::ColoredString;
                 let mut size_color = path.size.white();
-                if path.is_dir {
-                    file_name_color = path.file_name.blue();
+                let file_name_color: colored::ColoredString = if path.is_dir {
+                    path.file_name.blue()
                 } else {
-                    file_name_color = path.file_name.white();
                     size_color = path.size.yellow();
-                }
+                    path.file_name.white()
+                };
                 path.print_string = format!(
                     "{} {} {}",
                     size_color,
@@ -143,11 +142,10 @@ impl Paths {
             todo!()
         } else {
             self.paths.iter_mut().for_each(|path| {
-                let file_name_color: colored::ColoredString;
-                if path.is_dir {
-                    file_name_color = path.file_name.blue();
+                let file_name_color: colored::ColoredString = if path.is_dir {
+                    path.file_name.blue()
                 } else {
-                    file_name_color = path.file_name.white();
+                    path.file_name.white()
                 };
                 path.print_string = format!("{file_name_color}");
             });
