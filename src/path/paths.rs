@@ -293,7 +293,7 @@ mod tests {
         // This is need as this is the result of any string using the Colored white fn
         path1.print_string = "\u{1b}[37m.test\u{1b}[0m".to_owned();
 
-        assert_eq!(paths.paths.contains(&path1), false);
+        assert!(!paths.paths.contains(&path1));
     }
 
     #[test]
@@ -317,6 +317,6 @@ mod tests {
         // This is need as this is the result of any string using the Colored white fn
         path1.print_string = "\u{1b}[37m.test\u{1b}[0m".to_owned();
 
-        assert_eq!(paths.paths.contains(&path1), true);
+        assert!(paths.paths.contains(&path1));
     }
 }
