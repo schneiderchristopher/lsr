@@ -17,22 +17,12 @@ pub struct Path {
     is_dir: bool,
     size: String,
     time: String,
+    print_string: String,
 }
 
 impl Path {
     pub fn print(&self) {
-        let mut file_name_color = self.file_name.blue();
-        let mut size_color = self.size.white();
-        if !self.is_dir {
-            file_name_color = self.file_name.white();
-            size_color = self.size.yellow();
-        }
-        println!(
-            "{} {} {}",
-            file_name_color,
-            size_color,
-            self.time.bright_cyan()
-        )
+        println!("{}", self.print_string);
     }
 
     pub fn new(paths: DirEntry) -> Self {
@@ -45,6 +35,7 @@ impl Path {
             is_dir,
             size: Path::size_string_formatter(size),
             time: Path::set_time(metadata.modified().unwrap()).unwrap(),
+            print_string: String::new(),
         }
     }
 
@@ -116,8 +107,8 @@ impl Paths {
     }
 
     pub fn print(mut self) {
-        self.print_constructor();
         self.indentate_paths();
+        self.print_constructor();
         for path in self.paths.into_iter() {
             path.print();
         }
@@ -126,7 +117,40 @@ impl Paths {
     fn print_constructor(&mut self) {
         if !self.all {
             self.paths
-                .retain_mut(|path| !path.file_name.starts_with("."));
+                .retain_mut(|path| !path.file_name.starts_with('.'));
+        }
+
+        if self.long && !self.tree.0 {
+            self.paths.iter_mut().for_each(|path| {
+                let file_name_color: colored::ColoredString;
+                let mut size_color = path.size.white();
+                if path.is_dir {
+                    file_name_color = path.file_name.blue();
+                } else {
+                    file_name_color = path.file_name.white();
+                    size_color = path.size.yellow();
+                }
+                path.print_string = format!(
+                    "{} {} {}",
+                    size_color,
+                    path.time.bright_cyan(),
+                    file_name_color
+                );
+            });
+        } else if self.long && self.tree.0 {
+            todo!()
+        } else if !self.long && self.tree.0 {
+            todo!()
+        } else {
+            self.paths.iter_mut().for_each(|path| {
+                let file_name_color: colored::ColoredString;
+                if path.is_dir {
+                    file_name_color = path.file_name.blue();
+                } else {
+                    file_name_color = path.file_name.white();
+                };
+                path.print_string = format!("{file_name_color}");
+            });
         }
     }
 
@@ -178,12 +202,14 @@ mod tests {
             is_dir: false,
             size: "1kb".to_owned(),
             time: "test".to_owned(),
+            print_string: "print".to_owned(),
         };
         let path2 = Path {
             file_name: "test_test".to_owned(),
             is_dir: false,
             size: "1kb".to_owned(),
             time: "test".to_owned(),
+            print_string: "print".to_owned(),
         };
         let mut paths = Paths::default();
         paths.paths.push(path1);
@@ -204,12 +230,14 @@ mod tests {
             is_dir: false,
             size: "1kb".to_owned(),
             time: "test".to_owned(),
+            print_string: "print".to_owned(),
         };
         let path2 = Path {
             file_name: "test_test".to_owned(),
             is_dir: false,
             size: "1kb".to_owned(),
             time: "test".to_owned(),
+            print_string: "print".to_owned(),
         };
         let mut paths = Paths::default();
         paths.paths.push(path1);
@@ -252,24 +280,20 @@ mod tests {
         let all = false;
         let long = false;
         let tree = None;
-
         paths.setup_args((all, long, tree));
-        let path1 = Path {
+
+        let mut path1 = Path {
             file_name: ".test".to_owned(),
             is_dir: false,
             size: "1kb".to_owned(),
             time: "test".to_owned(),
-        };
-        let path2 = Path {
-            file_name: "test_test".to_owned(),
-            is_dir: false,
-            size: "1kb".to_owned(),
-            time: "test".to_owned(),
+            print_string: "print".to_owned(),
         };
 
         paths.paths.push(path1.clone());
-        paths.paths.push(path2);
         paths.print_constructor();
+        // This is need as this is the result of any string using the Colored white fn
+        path1.print_string = "\u{1b}[37m.test\u{1b}[0m".to_owned();
 
         assert_eq!(paths.paths.contains(&path1), false);
     }
@@ -282,22 +306,18 @@ mod tests {
         let tree = None;
         paths.setup_args((all, long, tree));
 
-        let path1 = Path {
+        let mut path1 = Path {
             file_name: ".test".to_owned(),
             is_dir: false,
             size: "1kb".to_owned(),
             time: "test".to_owned(),
-        };
-        let path2 = Path {
-            file_name: "test_test".to_owned(),
-            is_dir: false,
-            size: "1kb".to_owned(),
-            time: "test".to_owned(),
+            print_string: "print".to_owned(),
         };
 
         paths.paths.push(path1.clone());
-        paths.paths.push(path2);
         paths.print_constructor();
+        // This is need as this is the result of any string using the Colored white fn
+        path1.print_string = "\u{1b}[37m.test\u{1b}[0m".to_owned();
 
         assert_eq!(paths.paths.contains(&path1), true);
     }
