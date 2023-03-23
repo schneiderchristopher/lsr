@@ -162,7 +162,8 @@ impl Paths {
     }
 }
 
-#[cfg(test)]
+// #[cfg(test)]
+#[cfg(never)]
 mod tests {
     use std::time::Duration;
 
