@@ -29,6 +29,12 @@ pub struct Cli {
     /// Don't show permissions
     #[arg(short = 'p', long)]
     pub noperms: bool,
+    /// Show file creation date
+    #[arg(short, long)]
+    pub created: bool,
+    /// Show file modification date
+    #[arg(short, long)]
+    pub modified: bool,
     /// The folder to list files in
     #[arg(default_value = ".", value_name = "DIR")]
     pub target: PathBuf,

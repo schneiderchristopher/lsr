@@ -25,6 +25,8 @@ where
     pub(super) si: bool,
     pub(super) paths: I,
     pub(super) perms: bool,
+    pub(super) created: bool,
+    pub(super) modified: bool,
     pub(super) header: bool,
 
     #[cfg(unix)]
@@ -54,6 +56,8 @@ impl<I: std::iter::Iterator<Item = io::Result<DirEntry>>> Paths<I> {
             paths: iter,
             header: options.header,
             perms: options.perms,
+            created: options.created,
+            modified: options.modified,
             #[cfg(unix)]
             current_uid: users::get_current_uid(),
         }
@@ -130,6 +134,8 @@ pub struct PathOptions {
     pub(super) icons: bool,
     pub(super) show_size: bool,
     pub(super) perms: bool,
+    pub(super) created: bool,
+    pub(super) modified: bool,
     pub(super) si: bool,
     pub(super) header: bool,
 }
@@ -162,6 +168,14 @@ impl PathOptions {
         self.perms = show;
         self
     }
+    pub fn show_modified(&mut self, show: bool) -> &mut Self {
+        self.modified = show;
+        self
+    }
+    pub fn show_created(&mut self, show: bool) -> &mut Self {
+        self.created = show;
+        self
+    }
 }
 
 impl Default for PathOptions {
@@ -172,6 +186,8 @@ impl Default for PathOptions {
             perms: true,
             icons: false,
             header: false,
+            created: false,
+            modified: false,
             si: false,
         }
     }

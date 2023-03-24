@@ -3,8 +3,10 @@ use std::{
     fs::DirEntry,
     io::{self, Write},
     os::unix::prelude::OsStrExt,
+    time::SystemTime,
 };
 
+use chrono::{DateTime, Datelike, Local};
 use owo_colors::{DynColor, OwoColorize, Style};
 
 use crate::{
@@ -22,15 +24,14 @@ impl<I: std::iter::Iterator<Item = io::Result<DirEntry>>> Paths<I> {
         let color = supports_color::on_cached(supports_color::Stream::Stdout);
         // Set up functions to be used for printing
         #[cfg(unix)]
-        let print_perms: fn(u32, &CompositePath, &mut W) -> Result<(), io::Error> = {
-            if self.perms {
-                if color.is_some() {
-                    |current_uid, path, w| path.permissions.print_color(w, current_uid)
-                } else {
-                    |current_uid, path, w| path.permissions.print(w, current_uid)
-                }
+        let print_perms: fn(u32, &CompositePath, &mut W) -> Result<(), io::Error> = 'perms: {
+            if !self.perms {
+                break 'perms |_, _, _| Ok(());
+            };
+            if color.is_some() {
+                |current_uid, path, w| path.permissions.print_color(w, current_uid)
             } else {
-                |_, _, _| Ok(())
+                |current_uid, path, w| path.permissions.print(w, current_uid)
             }
         };
 
@@ -45,9 +46,70 @@ impl<I: std::iter::Iterator<Item = io::Result<DirEntry>>> Paths<I> {
                 (false, true) => |path, w| write!(w, "{:?} ", path.dir_or_file),
             }
         };
-        let print_icon: fn(&CompositePath, &mut W) -> Result<(), io::Error> = 'size: {
+        let current_time = chrono::Local::now();
+        let print_created: fn(&DateTime<Local>, &CompositePath, &mut W) -> Result<(), io::Error> = 'created: {
+            if !self.created {
+                break 'created |_, _, _| Ok(());
+            }
+            if color.is_some() {
+                |current_time, path, w| {
+                    let Some(datetime): Option<DateTime<Local>> = path.created.map(|time|time.into()) else {return write!(w, "             ")};
+                    let format = if matches!(current_time.years_since(datetime), Some(years) if years >= 1)
+                    {
+                        "%e %b  %Y"
+                    } else {
+                        "%e %b %R"
+                    };
+                    let formatted = datetime.format(format);
+                    write!(w, "{} ", formatted.blue())
+                }
+            } else {
+                |current_time, path, w| {
+                    let Some(datetime): Option<DateTime<Local>> = path.created.map(|time|time.into()) else {return write!(w, "             ")};
+                    let format = if matches!(current_time.years_since(datetime), Some(years) if years >= 1)
+                    {
+                        "%e %b  %Y"
+                    } else {
+                        "%e %b %R"
+                    };
+                    let formatted = datetime.format(format);
+                    write!(w, "{} ", formatted)
+                }
+            }
+        };
+        let print_modified: fn(&DateTime<Local>, &CompositePath, &mut W) -> Result<(), io::Error> = 'modified: {
+            if !self.modified {
+                break 'modified |_, _, _| Ok(());
+            }
+            if color.is_some() {
+                |current_time, path, w| {
+                    let Some(datetime): Option<DateTime<Local>> = path.modified.map(|time|time.into()) else {return write!(w, "             ")};
+                    let format = if matches!(current_time.years_since(datetime), Some(years) if years >= 1)
+                    {
+                        "%e %b  %Y"
+                    } else {
+                        "%e %b %R"
+                    };
+                    let formatted = datetime.format(format);
+                    write!(w, "{} ", formatted.purple())
+                }
+            } else {
+                |current_time, path, w| {
+                    let Some(datetime): Option<DateTime<Local>> = path.modified.map(|time|time.into()) else {return write!(w, "             ")};
+                    let format = if matches!(current_time.years_since(datetime), Some(years) if years >= 1)
+                    {
+                        "%e %b  %Y"
+                    } else {
+                        "%e %b %R"
+                    };
+                    let formatted = datetime.format(format);
+                    write!(w, "{} ", formatted)
+                }
+            }
+        };
+        let print_icon: fn(&CompositePath, &mut W) -> Result<(), io::Error> = 'icons: {
             if !self.icons {
-                break 'size |_, _| Ok(());
+                break 'icons |_, _| Ok(());
             };
             if color.is_some() {
                 |path, w| write!(w, "{} ", path.icon().colored())
@@ -78,6 +140,12 @@ impl<I: std::iter::Iterator<Item = io::Result<DirEntry>>> Paths<I> {
             if self.icons {
                 write!(w, "  ")?;
             }
+            if self.created {
+                write!(w, "   Created  ")?;
+            }
+            if self.modified {
+                write!(w, "  Modified  ")?;
+            }
             write!(w, "Filename")?;
             writeln!(w)?;
         }
@@ -88,6 +156,8 @@ impl<I: std::iter::Iterator<Item = io::Result<DirEntry>>> Paths<I> {
                 #[cfg(unix)]
                 print_perms(self.current_uid, &path, &mut w)?;
                 print_size(&path, &mut w)?;
+                print_created(&current_time, &path, &mut w)?;
+                print_modified(&current_time, &path, &mut w)?;
                 print_icon(&path, &mut w)?;
                 print_name(&path, &mut w)?;
                 writeln!(w)
@@ -102,6 +172,8 @@ impl<I: std::iter::Iterator<Item = io::Result<DirEntry>>> Paths<I> {
                     #[cfg(unix)]
                     print_perms(self.current_uid, &path, &mut w)?;
                     print_size(&path, &mut w)?;
+                    print_created(&current_time, &path, &mut w)?;
+                    print_modified(&current_time, &path, &mut w)?;
                     print_icon(&path, &mut w)?;
                     print_name(&path, &mut w)?;
                     writeln!(w)

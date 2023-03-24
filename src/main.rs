@@ -37,7 +37,9 @@ fn main() -> std::io::Result<()> {
             .show_icons(!cli.icons)
             .use_si(cli.si)
             .show_header(cli.header)
-            .show_permissions(!cli.noperms);
+            .show_permissions(!cli.noperms)
+            .show_created(cli.created)
+            .show_modified(cli.modified);
         Paths::new(options, directories)
     };
     paths.print(stdout)
