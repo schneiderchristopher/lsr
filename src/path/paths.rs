@@ -1,16 +1,7 @@
-use std::{
-    ffi::OsString,
-    fmt::{Debug, Display},
-    fs::{DirEntry, FileType},
-    io,
-    os::unix::prelude::OsStrExt,
-    time::SystemTime,
-};
+use std::{ffi::OsString, fmt::Debug, fs::DirEntry, io, time::SystemTime};
 
 #[cfg(unix)]
 use std::os::unix::fs::MetadataExt;
-
-use owo_colors::OwoColorize;
 
 use super::UnixPerms;
 
@@ -28,9 +19,8 @@ where
     pub(super) created: bool,
     pub(super) modified: bool,
     pub(super) header: bool,
-
-    #[cfg(unix)]
-    pub(super) current_uid: u32,
+    // #[cfg(unix)]
+    // pub(super) current_uid: u32,
 }
 
 pub enum EitherIter<AIterType, BIterType> {
@@ -58,8 +48,8 @@ impl<I: std::iter::Iterator<Item = io::Result<DirEntry>>> Paths<I> {
             perms: options.perms,
             created: options.created,
             modified: options.modified,
-            #[cfg(unix)]
-            current_uid: users::get_current_uid(),
+            // #[cfg(unix)]
+            // current_uid: users::get_current_uid(),
         }
     }
 }

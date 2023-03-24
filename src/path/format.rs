@@ -1,13 +1,12 @@
 use std::{
-    fmt::{self, Alignment, Debug, Display},
+    fmt::{self, Debug, Display},
     fs::DirEntry,
     io::{self, Write},
     os::unix::prelude::OsStrExt,
-    time::SystemTime,
 };
 
-use chrono::{DateTime, Datelike, Local};
-use owo_colors::{DynColor, OwoColorize, Style};
+use chrono::{DateTime, Local};
+use owo_colors::OwoColorize;
 
 use crate::{
     size::{IntoSize, MAX_SIZE_LEN},
@@ -24,14 +23,14 @@ impl<I: std::iter::Iterator<Item = io::Result<DirEntry>>> Paths<I> {
         let color = supports_color::on_cached(supports_color::Stream::Stdout);
         // Set up functions to be used for printing
         #[cfg(unix)]
-        let print_perms: fn(u32, &CompositePath, &mut W) -> Result<(), io::Error> = 'perms: {
+        let print_perms: fn(&CompositePath, &mut W) -> Result<(), io::Error> = 'perms: {
             if !self.perms {
-                break 'perms |_, _, _| Ok(());
+                break 'perms |_, _| Ok(());
             };
             if color.is_some() {
-                |current_uid, path, w| path.permissions.print_color(w, current_uid)
+                |path, w| path.permissions.print_color(w)
             } else {
-                |current_uid, path, w| path.permissions.print(w, current_uid)
+                |path, w| path.permissions.print(w)
             }
         };
 
@@ -117,7 +116,7 @@ impl<I: std::iter::Iterator<Item = io::Result<DirEntry>>> Paths<I> {
                 |path, w| write!(w, "{} ", path.icon())
             }
         };
-        let print_name: fn(&CompositePath, &mut W) -> Result<(), io::Error> = 'size: {
+        let print_name: fn(&CompositePath, &mut W) -> Result<(), io::Error> = {
             if color.is_some() {
                 |path, w| match path.dir_or_file {
                     DirOrFile::Dir => {
@@ -154,7 +153,7 @@ impl<I: std::iter::Iterator<Item = io::Result<DirEntry>>> Paths<I> {
                 let entry = entry?;
                 let path: CompositePath = entry.try_into()?;
                 #[cfg(unix)]
-                print_perms(self.current_uid, &path, &mut w)?;
+                print_perms(&path, &mut w)?;
                 print_size(&path, &mut w)?;
                 print_created(&current_time, &path, &mut w)?;
                 print_modified(&current_time, &path, &mut w)?;
@@ -170,7 +169,7 @@ impl<I: std::iter::Iterator<Item = io::Result<DirEntry>>> Paths<I> {
                 if path.name.as_bytes().get(0).map(|&b| b) != Some(b'.') {
                     // If the name doesn't start with a .
                     #[cfg(unix)]
-                    print_perms(self.current_uid, &path, &mut w)?;
+                    print_perms(&path, &mut w)?;
                     print_size(&path, &mut w)?;
                     print_created(&current_time, &path, &mut w)?;
                     print_modified(&current_time, &path, &mut w)?;

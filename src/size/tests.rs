@@ -1,5 +1,3 @@
-use std::fmt::Write;
-
 #[cfg(test)]
 mod tests {
     use super::super::*;

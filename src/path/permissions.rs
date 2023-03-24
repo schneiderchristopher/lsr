@@ -1,7 +1,4 @@
-use std::{
-    fmt::Display,
-    io::{self, Write},
-};
+use std::io::{self, Write};
 
 use owo_colors::OwoColorize;
 use users::User;
@@ -41,7 +38,7 @@ impl UnixPerms {
     //     }
     // }
 
-    pub fn print<W: Write>(&self, mut w: &mut W, current_uid: u32) -> io::Result<()> {
+    pub fn print<W: Write>(&self, w: &mut W) -> io::Result<()> {
         let (user, group, other) = self.all();
         for perm in [user, group, other] {
             perm.print(w)?
@@ -49,11 +46,11 @@ impl UnixPerms {
         Ok(())
     }
 
-    pub fn print_color<W: Write>(&self, mut w: &mut W, current_uid: u32) -> io::Result<()> {
+    pub fn print_color<W: Write>(&self, w: &mut W) -> io::Result<()> {
         let (user, group, other) = self.all();
-        write!(w, "\x1b[1m");
+        write!(w, "\x1b[1m")?;
         user.print_color(w)?;
-        write!(w, "\x1b[0m");
+        write!(w, "\x1b[0m")?;
         for perm in [group, other] {
             perm.print_color(w)?
         }
@@ -118,8 +115,7 @@ impl UserPerms {
     }
 
     const PLACEHOLDER: char = '-';
-    pub fn print<W: Write>(&self, mut w: &mut W) -> io::Result<()> {
-        write!(w, "{}", self.0);
+    pub fn print<W: Write>(&self, w: &mut W) -> io::Result<()> {
         let read = if self.read() { 'r' } else { Self::PLACEHOLDER };
         let write = if self.write() { 'w' } else { Self::PLACEHOLDER };
         let execute = if self.execute() {
@@ -130,7 +126,7 @@ impl UserPerms {
         write!(w, "{read}{write}{execute}")
     }
 
-    pub fn print_color<W: Write>(&self, mut w: &mut W) -> io::Result<()> {
+    pub fn print_color<W: Write>(&self, w: &mut W) -> io::Result<()> {
         if self.read() {
             write!(w, "{}", 'r'.yellow())
         } else {

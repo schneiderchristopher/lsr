@@ -1,4 +1,4 @@
-use std::fmt::{Debug, Display, Write};
+use std::fmt::{Debug, Display};
 mod constants;
 mod convenience;
 pub use constants::*;
@@ -137,7 +137,7 @@ impl<'a> DecimalSize {
         let round = converted.fract() < 0.1;
         // FIXME: Rather incomplete alignment implementation, but good enough for what we're doing
         match (f.width(), f.align()) {
-            (Some(width), Some(align)) => {
+            (Some(width), Some(_)) => {
                 if round {
                     write!(f, "{converted:>width$.0}{name}", width = width)
                 } else {

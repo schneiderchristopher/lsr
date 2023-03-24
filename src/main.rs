@@ -2,10 +2,8 @@ use clap::Parser;
 use lsr::cmd::cli::Cli;
 use lsr::path::{PathOptions, Paths};
 // use lsr::path::paths::{Path, Paths};
-use lsr::size::{IntoSize, LongSize, Size};
 use owo_colors::{OwoColorize, Stream::*, Style};
-use std::io::{self, stdout, BufWriter, ErrorKind, Write};
-use std::{env, fs};
+use std::io::{stdout, BufWriter, ErrorKind};
 
 fn main() -> std::io::Result<()> {
     let error_style = Style::new().red().bold();
