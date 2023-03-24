@@ -34,6 +34,7 @@ fn main() -> std::io::Result<()> {
         let mut options = PathOptions::new();
         options.show_hidden(cli.hidden);
         options.show_size(!cli.nosize);
+        options.show_icons(!cli.noicons);
         Paths::from_iter(options, directories)?
     };
     print!("{paths}");

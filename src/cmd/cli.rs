@@ -14,9 +14,12 @@ pub struct Cli {
     /// Use SI units instead of true powers of two
     #[arg(short = 'S', long)]
     pub si: bool,
-    /// Don't show file sizes
+    /// don't show file sizes
     #[arg(short = 's', long)]
     pub nosize: bool,
+    /// don't show file icons
+    #[arg(short = 'n', long)]
+    pub noicons: bool,
     /// Display the files in a tree
     #[arg(short, long)]
     pub tree: bool,

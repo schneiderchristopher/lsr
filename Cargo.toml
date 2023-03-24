@@ -18,5 +18,6 @@ name = "lsr"
 [dependencies]
 chrono = "0.4.23"
 clap = { version = "4.1.4", features = ["derive"] }
+once_cell = "1.17.1"
 owo-colors = { version = "3.5.0", features = ["supports-colors"] }
 supports-color = "2.0.0"

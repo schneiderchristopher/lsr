@@ -6,11 +6,14 @@ use std::{
     os::unix::prelude::OsStrExt,
 };
 
+use once_cell::sync::Lazy;
+use owo_colors::OwoColorize;
+
 #[derive(Debug)]
 pub struct Paths {
     pub(super) show_hidden: bool,
     pub(super) icons: bool,
-    show_size: bool,
+    pub(super) show_size: bool,
     pub(super) paths: Vec<CompositePath>,
 }
 
@@ -86,6 +89,8 @@ pub struct CompositePath {
     pub(super) dir_or_file: DirOrFile,
 }
 
+pub(super) struct ColoredCompositePath<'a>(pub &'a CompositePath);
+
 impl TryFrom<DirEntry> for CompositePath {
     type Error = io::Error;
 
@@ -105,6 +110,25 @@ impl TryFrom<DirEntry> for CompositePath {
 pub(super) enum DirOrFile {
     Dir,
     File(u64),
+}
+
+static COLOR_DIR: Lazy<String> = Lazy::new(|| "".blue().to_string());
+static COLOR_FILE: Lazy<String> = Lazy::new(|| "".blue().to_string());
+
+impl DirOrFile {
+    pub(super) fn icon(&self) -> &'static str {
+        match self {
+            Self::Dir => "",
+            Self::File(_) => "",
+        }
+    }
+
+    pub(super) fn icon_colored(&self) -> &'static str {
+        match self {
+            Self::Dir => &COLOR_DIR,
+            Self::File(_) => &COLOR_FILE,
+        }
+    }
 }
 
 pub(super) struct ColoredDirOrFile(pub DirOrFile);
