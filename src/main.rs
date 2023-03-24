@@ -32,7 +32,7 @@ fn main() -> std::io::Result<()> {
         let mut options = PathOptions::new();
         options
             .show_hidden(cli.hidden)
-            .show_size(!cli.nosize)
+            .show_size(cli.long)
             .show_icons(!cli.icons)
             .use_si(cli.si)
             .show_header(cli.header)

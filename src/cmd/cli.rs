@@ -5,7 +5,7 @@ use clap::Parser;
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 pub struct Cli {
-    /// Display with Date Modified and File Size
+    /// Display with File Size
     #[arg(short, long)]
     pub long: bool,
     /// Display all files including hidden ones
@@ -14,9 +14,6 @@ pub struct Cli {
     /// Use SI units instead of true powers of two
     #[arg(short = 'S', long)]
     pub si: bool,
-    /// Disable file sizes
-    #[arg(short = 's', long)]
-    pub nosize: bool,
     /// Disable file icons
     #[arg(short = 'i', long)]
     pub icons: bool,
