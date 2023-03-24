@@ -54,7 +54,7 @@ impl UnixPerms {
         for perm in [group, other] {
             perm.print_color(w)?
         }
-        Ok(())
+        write!(w, " ")
     }
 }
 

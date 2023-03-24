@@ -133,7 +133,7 @@ impl<I: std::iter::Iterator<Item = io::Result<DirEntry>>> Paths<I> {
         // Print the header if it's enabled
         if self.header {
             if self.perms {
-                write!(w, "Perms    ")?;
+                write!(w, "Perms     ")?;
             }
             write!(w, "   Size ")?;
             if self.icons {
