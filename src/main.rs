@@ -4,7 +4,7 @@ use lsr::path::{PathOptions, Paths};
 // use lsr::path::paths::{Path, Paths};
 use lsr::size::{IntoSize, LongSize, Size};
 use owo_colors::{OwoColorize, Stream::*, Style};
-use std::io::{self, stdout, ErrorKind, Write};
+use std::io::{self, stdout, BufWriter, ErrorKind, Write};
 use std::{env, fs};
 
 fn main() -> std::io::Result<()> {
@@ -28,6 +28,7 @@ fn main() -> std::io::Result<()> {
     };
 
     let stdout = stdout().lock();
+    let writer = BufWriter::new(stdout);
 
     let mut paths = {
         let mut options = PathOptions::new();
@@ -42,5 +43,5 @@ fn main() -> std::io::Result<()> {
             .show_modified(cli.modified);
         Paths::new(options, directories)
     };
-    paths.print(stdout)
+    paths.print(writer)
 }
