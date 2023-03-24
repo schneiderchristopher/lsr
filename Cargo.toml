@@ -16,6 +16,7 @@ categories = ["command-line-utilities"]
 name = "lsr"
 
 [dependencies]
-colored = "2.0.0"
 chrono = "0.4.23"
 clap = { version = "4.1.4", features = ["derive"] }
+owo-colors = { version = "3.5.0", features = ["supports-colors"] }
+supports-color = "2.0.0"
