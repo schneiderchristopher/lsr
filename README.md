@@ -1,4 +1,4 @@
-# LSR - A Rust Implementation of LS for Windows(and possibly other platforms)
+# LSR - A Rust Implementation of LS
 
 **This is underdevelopment**
 
