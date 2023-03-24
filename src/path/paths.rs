@@ -1,6 +1,6 @@
 use std::{
     ffi::OsString,
-    fmt::Display,
+    fmt::{Debug, Display},
     fs::{DirEntry, FileType},
     io,
     os::unix::prelude::OsStrExt,
@@ -10,76 +10,39 @@ use once_cell::sync::Lazy;
 use owo_colors::OwoColorize;
 
 #[derive(Debug)]
-pub struct Paths {
+pub struct Paths<I>
+where
+    I: Iterator<Item = io::Result<DirEntry>>,
+{
     pub(super) show_hidden: bool,
     pub(super) icons: bool,
     pub(super) show_size: bool,
-    pub(super) paths: Vec<CompositePath>,
+    pub(super) si: bool,
+    pub(super) paths: I,
 }
 
-impl From<PathOptions> for Paths {
-    fn from(value: PathOptions) -> Self {
-        Self {
-            show_hidden: value.show_hidden,
-            show_size: value.show_size,
-            icons: value.icons,
-            paths: Vec::new(),
-        }
+pub enum EitherIter<AIterType, BIterType> {
+    A(AIterType),
+    B(BIterType),
+}
+
+impl<I: std::iter::Iterator<Item = io::Result<DirEntry>>> Paths<I> {
+    pub fn new(options: PathOptions, iter: I) -> Self {
+        Self::from_iter(options, iter)
     }
-}
 
-impl Paths {
-    pub fn new(options: PathOptions) -> Self {
+    pub fn process_entry(entry: DirEntry) -> io::Result<CompositePath> {
+        entry.try_into()
+    }
+
+    pub fn from_iter(options: PathOptions, iter: I) -> Paths<I> {
         Self {
             show_hidden: options.show_hidden,
-            show_size: options.show_size,
             icons: options.icons,
-            paths: Vec::new(),
+            show_size: options.show_size,
+            si: options.si,
+            paths: iter,
         }
-    }
-
-    pub fn push(&mut self, path: CompositePath) {
-        self.paths.push(path)
-    }
-
-    pub fn push_entry(&mut self, entry: DirEntry) -> io::Result<()> {
-        let path: CompositePath = entry.try_into()?;
-        Ok(self.push(path))
-    }
-
-    pub fn from_iter<I>(options: PathOptions, iter: I) -> io::Result<Self>
-    where
-        I: Iterator<Item = std::io::Result<DirEntry>>,
-    {
-        let mut paths = Self::new(options);
-        paths.fill_with_iter(iter)?;
-        Ok(paths)
-    }
-
-    pub fn fill_with_iter<I>(&mut self, mut iter: I) -> io::Result<()>
-    where
-        I: Iterator<Item = std::io::Result<DirEntry>>,
-    {
-        if self.show_hidden {
-            for entry in iter {
-                let entry = entry?;
-                let name = entry.file_name();
-                if matches!(name.as_bytes().get(0), Some(b'.')) {
-                    continue;
-                }
-                self.push_entry(entry)?;
-            }
-        } else {
-            for entry in iter {
-                let entry = entry?;
-                let name = entry.file_name();
-                if matches!(name.as_bytes().get(0), Some(b'.')) {
-                    continue;
-                }
-                self.push_entry(entry)?;
-            }
-        };
-        Ok(())
     }
 }
 
@@ -106,27 +69,17 @@ impl TryFrom<DirEntry> for CompositePath {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub(super) enum DirOrFile {
     Dir,
     File(u64),
 }
-
-static COLOR_DIR: Lazy<String> = Lazy::new(|| "".blue().to_string());
-static COLOR_FILE: Lazy<String> = Lazy::new(|| "".blue().to_string());
 
 impl DirOrFile {
     pub(super) fn icon(&self) -> &'static str {
         match self {
             Self::Dir => "",
             Self::File(_) => "",
-        }
-    }
-
-    pub(super) fn icon_colored(&self) -> &'static str {
-        match self {
-            Self::Dir => &COLOR_DIR,
-            Self::File(_) => &COLOR_FILE,
         }
     }
 }
@@ -138,6 +91,7 @@ pub struct PathOptions {
     pub(super) show_hidden: bool,
     pub(super) icons: bool,
     pub(super) show_size: bool,
+    pub(super) si: bool,
 }
 
 impl PathOptions {
@@ -156,6 +110,10 @@ impl PathOptions {
         self.show_size = show;
         self
     }
+    pub fn use_si(&mut self, si: bool) -> &mut Self {
+        self.si = si;
+        self
+    }
 }
 
 impl Default for PathOptions {
@@ -164,6 +122,7 @@ impl Default for PathOptions {
             show_hidden: false,
             show_size: true,
             icons: false,
+            si: false,
         }
     }
 }

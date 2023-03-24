@@ -4,7 +4,7 @@ use lsr::path::{PathOptions, Paths};
 // use lsr::path::paths::{Path, Paths};
 use lsr::size::{IntoSize, LongSize, Size};
 use owo_colors::{OwoColorize, Stream::*, Style};
-use std::io::{self, stdout, ErrorKind};
+use std::io::{self, stdout, ErrorKind, Write};
 use std::os::unix::prelude::OsStrExt;
 use std::{env, fs};
 
@@ -30,14 +30,15 @@ fn main() -> std::io::Result<()> {
 
     let mut stdout = stdout().lock();
 
-    let paths = {
+    let mut paths = {
         let mut options = PathOptions::new();
         options.show_hidden(cli.hidden);
         options.show_size(!cli.nosize);
         options.show_icons(!cli.noicons);
-        Paths::from_iter(options, directories)?
+        options.use_si(cli.si);
+        Paths::new(options, directories)
     };
-    print!("{paths}");
+    paths.print(stdout)?;
 
     // let mut paths = Paths::default();
     // paths.setup_args((cli.all, cli.long, cli.tree));
