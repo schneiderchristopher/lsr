@@ -2,7 +2,7 @@
 
 **This is underdevelopment**
 
-![Screenshots of lsr](screenshot.png)
+![Screenshots of lsr](image.png)
 
 ## Quick Start
 
