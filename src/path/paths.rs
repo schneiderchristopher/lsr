@@ -4,10 +4,15 @@ use std::{
     fs::{DirEntry, FileType},
     io,
     os::unix::prelude::OsStrExt,
+    time::SystemTime,
 };
 
-use once_cell::sync::Lazy;
+#[cfg(unix)]
+use std::os::unix::fs::MetadataExt;
+
 use owo_colors::OwoColorize;
+
+use super::UnixPerms;
 
 #[derive(Debug)]
 pub struct Paths<I>
@@ -19,6 +24,11 @@ where
     pub(super) show_size: bool,
     pub(super) si: bool,
     pub(super) paths: I,
+    pub(super) perms: bool,
+    pub(super) header: bool,
+
+    #[cfg(unix)]
+    pub(super) current_uid: u32,
 }
 
 pub enum EitherIter<AIterType, BIterType> {
@@ -42,6 +52,10 @@ impl<I: std::iter::Iterator<Item = io::Result<DirEntry>>> Paths<I> {
             show_size: options.show_size,
             si: options.si,
             paths: iter,
+            header: options.header,
+            perms: options.perms,
+            #[cfg(unix)]
+            current_uid: users::get_current_uid(),
         }
     }
 }
@@ -50,6 +64,10 @@ impl<I: std::iter::Iterator<Item = io::Result<DirEntry>>> Paths<I> {
 pub struct CompositePath {
     pub(super) name: OsString,
     pub(super) dir_or_file: DirOrFile,
+    pub(super) created: Option<SystemTime>,
+    pub(super) modified: Option<SystemTime>,
+    #[cfg(unix)]
+    pub(super) permissions: UnixPerms,
 }
 
 pub(super) struct ColoredCompositePath<'a>(pub &'a CompositePath);
@@ -65,7 +83,21 @@ impl TryFrom<DirEntry> for CompositePath {
         } else {
             DirOrFile::File(metadata.len())
         };
-        Ok(CompositePath { name, dir_or_file })
+        let created = metadata.created().ok();
+        let modified = metadata.modified().ok();
+        #[cfg(unix)]
+        let permissions = UnixPerms {
+            perms: metadata.mode(),
+            owner_uid: metadata.uid(),
+        };
+        metadata.uid();
+        Ok(CompositePath {
+            name,
+            dir_or_file,
+            modified,
+            created,
+            permissions,
+        })
     }
 }
 
@@ -75,15 +107,21 @@ pub(super) enum DirOrFile {
     File(u64),
 }
 
-impl DirOrFile {
-    pub(super) fn icon(&self) -> &'static str {
-        match self {
-            Self::Dir => "",
-            Self::File(_) => "",
-        }
+pub(super) struct Icon<'a>(pub(super) &'a CompositePath);
+pub(super) struct ColoredIcon<'a>(pub(super) &'a CompositePath);
+
+impl CompositePath {
+    pub(super) fn icon(&self) -> Icon {
+        Icon(self)
+    }
+}
+impl<'a> Icon<'a> {
+    pub fn colored(self: Icon<'a>) -> ColoredIcon<'a> {
+        ColoredIcon(self.0)
     }
 }
 
+#[derive(Clone, Copy)]
 pub(super) struct ColoredDirOrFile(pub DirOrFile);
 
 #[derive(Debug)]
@@ -91,7 +129,9 @@ pub struct PathOptions {
     pub(super) show_hidden: bool,
     pub(super) icons: bool,
     pub(super) show_size: bool,
+    pub(super) perms: bool,
     pub(super) si: bool,
+    pub(super) header: bool,
 }
 
 impl PathOptions {
@@ -114,6 +154,14 @@ impl PathOptions {
         self.si = si;
         self
     }
+    pub fn show_header(&mut self, show: bool) -> &mut Self {
+        self.header = show;
+        self
+    }
+    pub fn show_permissions(&mut self, show: bool) -> &mut Self {
+        self.perms = show;
+        self
+    }
 }
 
 impl Default for PathOptions {
@@ -121,7 +169,9 @@ impl Default for PathOptions {
         Self {
             show_hidden: false,
             show_size: true,
+            perms: true,
             icons: false,
+            header: false,
             si: false,
         }
     }

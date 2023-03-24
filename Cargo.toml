@@ -15,9 +15,15 @@ categories = ["command-line-utilities"]
 [[bin]]
 name = "lsr"
 
+# Used for getting username from UID
+[target.'cfg(unix)'.dependencies]
+users = "0.11.0"
+
 [dependencies]
 chrono = "0.4.23"
 clap = { version = "4.1.4", features = ["derive"] }
+libc = "0.2.140"
 once_cell = "1.17.1"
 owo-colors = { version = "3.5.0", features = ["supports-colors"] }
 supports-color = "2.0.0"
+users = "0.11.0"
