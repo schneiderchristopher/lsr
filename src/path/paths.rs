@@ -123,11 +123,12 @@ pub struct PathOptions {
     pub(super) show_hidden: bool,
     pub(super) icons: bool,
     pub(super) show_size: bool,
-    pub(super) perms: bool,
     pub(super) created: bool,
     pub(super) modified: bool,
     pub(super) si: bool,
     pub(super) header: bool,
+    #[cfg(unix)]
+    pub(super) perms: bool,
 }
 
 impl PathOptions {
@@ -154,6 +155,7 @@ impl PathOptions {
         self.header = show;
         self
     }
+    #[cfg(unix)]
     pub fn show_permissions(&mut self, show: bool) -> &mut Self {
         self.perms = show;
         self

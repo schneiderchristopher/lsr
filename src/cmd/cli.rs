@@ -23,6 +23,7 @@ pub struct Cli {
     #[arg(short = 't', long)]
     /// Show header with names of columns
     pub header: bool,
+    #[cfg(unix)]
     /// Don't show permissions
     #[arg(short = 'p', long)]
     pub noperms: bool,
