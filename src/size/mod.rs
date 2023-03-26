@@ -38,7 +38,10 @@ impl<'a> Size {
             // Only take the first one that matches, as every one after that is going to be smaller
             .take(1)
             .next() else {
-                return f.write_str(ZERO_SIZE);
+                return match f.width() {
+                Some(width) => write!(f, "{:>width$}", ZERO_SIZE, width=width+1),
+                    None => write!(f, "{}", ZERO_SIZE )
+                }
             };
         let converted = bytes / size;
         write!(f, "{converted:width$}{name}", width = width)
@@ -130,7 +133,10 @@ impl<'a> DecimalSize {
             // Only take the first one that matches, as every one after that is going to be smaller
             .take(1)
             .next() else {
-                return f.write_str(ZERO_SIZE);
+                return match f.width() {
+                Some(width) => write!(f, "{:>width$}", ZERO_SIZE, width=width+1),
+                    None => write!(f, "{}", ZERO_SIZE )
+                }
             };
         let converted = bytes as f32 / size as f32;
 

@@ -43,7 +43,7 @@ impl UnixPerms {
         for perm in [user, group, other] {
             perm.print(w)?
         }
-        Ok(())
+        write!(w, " ")
     }
 
     pub fn print_color<W: Write>(&self, w: &mut W) -> io::Result<()> {
