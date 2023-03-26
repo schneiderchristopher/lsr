@@ -143,7 +143,7 @@ impl<I: std::iter::Iterator<Item = io::Result<DirEntry>>> Paths<I> {
                 write!(w, "   Created  ")?;
             }
             if self.modified {
-                write!(w, "  Modified  ")?;
+                write!(w, "   Modified ")?;
             }
             write!(w, "Filename")?;
             writeln!(w)?;
