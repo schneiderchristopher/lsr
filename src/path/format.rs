@@ -132,6 +132,7 @@ impl<I: std::iter::Iterator<Item = io::Result<DirEntry>>> Paths<I> {
         };
         // Print the header if it's enabled
         if self.header {
+            #[cfg(unix)]
             if self.perms {
                 write!(w, "Perms     ")?;
             }
