@@ -136,7 +136,9 @@ impl<I: std::iter::Iterator<Item = io::Result<DirEntry>>> Paths<I> {
             if self.perms {
                 write!(w, "Perms     ")?;
             }
-            write!(w, "   Size ")?;
+            if self.show_size {
+                write!(w, "   Size ")?;
+            }
             if self.icons {
                 write!(w, "  ")?;
             }
