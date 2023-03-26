@@ -39,7 +39,7 @@ fn main() -> std::io::Result<()> {
             .show_created(cli.created)
             .show_modified(cli.modified);
         #[cfg(unix)]
-        options.show_permissions(1cli.noperms);
+        options.show_permissions(!cli.noperms);
         Paths::new(options, directories)
     };
     paths.print(writer)
